@@ -19,10 +19,12 @@ MAX_DIST = 22
 MAX_AGE = 20
 
 # skip to
-cap.set(cv2.CAP_PROP_POS_FRAMES, 3700)
+cap.set(cv2.CAP_PROP_POS_FRAMES, 4500)
 
 tap = 0
 hold = 0
+lhold = 0
+drag = 0
 flick = 0
 
 # prev_frame
@@ -121,10 +123,6 @@ while(True):
         
         pink = cv2.inRange(hsv, (148, 50, 155), (163, 255, 255))
 
-        # orange = cv2.erode(orange, kernel, iterations = 1)
-        # orange = cv2.dilate(orange, kernel, iterations = 2)
-        # orange = cv2.erode(orange, kernel, iterations = 1)
-
         pink_contours, h = cv2.findContours(
             pink,
             cv2.RETR_EXTERNAL,
@@ -135,6 +133,19 @@ while(True):
             arc_len = cv2.arcLength(cnt, True)
             approx = cv2.approxPolyDP(cnt, 0.03 * arc_len, True)
             pink = cv2.fillPoly(pink, pts=[approx], color=(255, 255, 255))
+        
+        yellow = cv2.inRange(hsv, (10, 32, 147), (36, 255, 255))
+
+        yellow_contours, h = cv2.findContours(
+            yellow,
+            cv2.RETR_EXTERNAL,
+            cv2.CHAIN_APPROX_SIMPLE
+        )
+
+        for n, cnt in enumerate(yellow_contours):
+            arc_len = cv2.arcLength(cnt, True)
+            approx = cv2.approxPolyDP(cnt, 0.03 * arc_len, True)
+            yellow = cv2.fillPoly(yellow, pts=[approx], color=(255, 255, 255))
 
         circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.25, 22, minRadius=8, maxRadius=40)
         if circles is not None:
@@ -173,6 +184,11 @@ while(True):
                         points.append([ x, y ])
                         label[ x, y ] = 4
                         count[ x, y ] = hold
+                    elif yellow[ y, x ] == 255:
+                        lhold += 1
+                        points.append([ x, y ])
+                        label[ x, y ] = 5
+                        count[ x, y ] = lhold
 
         # update the age of the point in points
         for pt in points:
@@ -202,6 +218,9 @@ while(True):
                 elif temp == 4:
                     txt = 'HOLD '
                     color = (0, 127, 255)
+                elif temp == 5:
+                    txt = 'LHOLD '
+                    color = (0, 255, 255)
                 
                 txt += str(count[x, y])
                 rotated = cv2.putText(rotated, txt, (x, y), font, 0.75, color, 2)
@@ -211,6 +230,7 @@ while(True):
         cv2.imshow('Blue', blue)
         cv2.imshow('Pink', pink)
         cv2.imshow('Orange', orange)
+        cv2.imshow('Yellow', yellow)
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break

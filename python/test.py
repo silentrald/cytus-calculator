@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-img = cv2.imread('pictures/pink_hold.png', cv2.IMREAD_UNCHANGED)
+img = cv2.imread('pictures/long_hold.png', cv2.IMREAD_UNCHANGED)
 
 def nothing(x):
     pass
