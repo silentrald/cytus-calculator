@@ -16,14 +16,17 @@ width = 360
 height = 480
 
 font = cv2.FONT_HERSHEY_SIMPLEX
-blank_image = np.zeros(shape=[width, height, 3], dtype=np.uint8)
+# blank_image = np.zeros(shape=[width, height, 3], dtype=np.uint8)
 
-MAX_DIST = 22
+MAX_DIST = 17
 MAX_AGE = 20
 
 # skip to
-# cap.set(cv2.CAP_PROP_POS_FRAMES, 5500)
-cap.set(cv2.CAP_PROP_POS_FRAMES, 200)
+start_frame = 200
+# start_frame = 3550
+cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+
+# total_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT) - start_frame
 
 tap = 0
 hold = 0
@@ -46,7 +49,7 @@ kernel = np.ones((3, 3), np.uint8)
 while(True):
     ret, frame = cap.read()
     # print(cap.get(cv2.CAP_PROP_POS_FRAMES))
-  
+
     if ret:
         resized = cv2.resize(
             frame,
@@ -71,7 +74,7 @@ while(True):
 
         for n, cnt in enumerate(green_contours):
             arc_len = cv2.arcLength(cnt, True)
-            approx = cv2.approxPolyDP(cnt, 0.035 * arc_len, True)
+            approx = cv2.approxPolyDP(cnt, 0.03 * arc_len, True)
             green = cv2.fillPoly(green, pts=[approx], color=(255, 255, 255))
             
             if arc_len > 120 and arc_len < 220:
@@ -111,7 +114,7 @@ while(True):
 
         for n, cnt in enumerate(blue_contours):
             arc_len = cv2.arcLength(cnt, True)
-            approx = cv2.approxPolyDP(cnt, 0.035 * arc_len, True)
+            approx = cv2.approxPolyDP(cnt, 0.03 * arc_len, True)
             blue = cv2.fillPoly(blue, pts=[approx], color=(255, 255, 255))
 
             if arc_len > 120 and arc_len < 220:
@@ -186,12 +189,12 @@ while(True):
             yellow = cv2.fillPoly(yellow, pts=[approx], color=(255, 255, 255))
 
         # circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.25, 22, maxRadius=40)
-        circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.25, 22, minRadius=4, maxRadius=40)
+        circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1.25, 17, minRadius=4, maxRadius=40)
         if circles is not None:
             circles = np.round(circles[0, :]).astype('int')
             
             for x, y, r in circles:
-                rotated = cv2.circle(rotated, (x, y), r, (0, 0, 0), 4)
+                # rotated = cv2.circle(rotated, (x, y), r, (0, 0, 0), 4)
 
                 insert = True
                 for pt in points:
@@ -348,7 +351,6 @@ while(True):
                     if [ x, y ] in start_drag:
                         start_drag.remove([ x, y ])
             else:
-                rotated = cv2.circle(rotated, (x, y), radius=4, color=(255, 255, 255), thickness=-1)
                 temp = label[x][y]
                 txt = ''
                 color = None
@@ -379,7 +381,14 @@ while(True):
                     color = (255, 0, 0)
                 
                 txt += str(count[x, y])
-                rotated = cv2.putText(rotated, txt, (x, y), font, 0.75, color, 2)
+
+                # Add Point
+                rotated = cv2.circle(rotated, (x, y), 3, (0, 0, 0), 3)
+                rotated = cv2.circle(rotated, (x, y), 3, color, -1)
+
+                # Add Text
+                rotated = cv2.putText(rotated, txt, (x - 30, y - 5), font, 0.6, (0, 0, 0), 8)
+                rotated = cv2.putText(rotated, txt, (x - 30, y - 5), font, 0.6, color, 2)
 
         cv2.imshow('Original', rotated)
         # cv2.imshow('Green', green)
