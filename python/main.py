@@ -8,8 +8,11 @@ if (cap.isOpened() == False):
     print('Error opening video stream or file')
 
 _, frame = cap.read()
-width = int(frame.shape[1] / 4)
-height = int(frame.shape[0] / 4)
+# TODO: Resize canvas to a 4:3 aspect ratio
+# width = int(frame.shape[1] / 4)
+# height = int(frame.shape[0] / 4)
+width = 360
+height = 480
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 blank_image = np.zeros(shape=[width, height, 3], dtype=np.uint8)
