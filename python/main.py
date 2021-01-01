@@ -1,4 +1,5 @@
-import copy
+# TODO: Tap Drag is not yet implemented
+
 import cv2
 import numpy as np
 
@@ -28,7 +29,7 @@ tap = 0
 hold = 0
 lhold = 0
 drag = 0
-flick = 0   
+flick = 0
 
 start_drag = []
 drag_edges = []
@@ -396,3 +397,11 @@ while(True):
 
 cv2.destroyAllWindows()
 cap.release()
+
+# Print results
+print('TAP:', tap)
+print('HOLD:', hold)
+print('DRAG:', drag)
+print('LHOLD:', lhold)
+print('FLICK:', flick)
+print('Total Notes:', tap + hold + drag + lhold + flick)
